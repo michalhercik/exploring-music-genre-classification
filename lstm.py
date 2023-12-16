@@ -3,8 +3,9 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 import tensorflow.keras as keras
 from config import MODEL_PATH, FEATURE_PATH
+import os
 
-MODEL_PATH = MODEL_PATH + "/lstm.keras"
+MODEL_PATH = os.path.join(MODEL_PATH, "/lstm.keras")
 
 
 def load_data(data_path):

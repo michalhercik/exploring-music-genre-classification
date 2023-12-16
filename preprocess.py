@@ -75,7 +75,17 @@ def save_mfcc(dataset_path, num_mfcc=13, n_fft=2048, hop_length=512, num_segment
         json.dump(data, fp, indent=2)
     with open(MAPPING_PATH, "w") as fp:
         json.dump(mapping, fp, indent=2)
-        
+
+def make_paths():
+    """Creates paths for the feature, and mapping files if they do not exist.
+
+        :return:
+        """
+    if not os.path.exists(FEATURE_PATH):
+        os.makedirs(FEATURE_PATH)
+    if not os.path.exists(MAPPING_PATH):
+        os.makedirs(MAPPING_PATH)
         
 if __name__ == "__main__":
+    make_paths()
     save_mfcc(DATASET_PATH, num_segments=NUM_SEGMENTS)

@@ -3,8 +3,9 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 import tensorflow.keras as keras
 from config import MODEL_PATH, FEATURE_PATH
+import os
 
-MLP_MODEL_PATH = MODEL_PATH + "/mlp.keras"
+MLP_MODEL_PATH = os.path.join(MODEL_PATH, "mlp.keras")
 
 def load_data(data_path):
     """Loads training dataset from json file.
@@ -22,6 +23,7 @@ def load_data(data_path):
     y = np.array(data["labels"])
 
     print("Data succesfully loaded!")
+    print(f"data shape: {X.shape}")
 
     return  X, y
 
