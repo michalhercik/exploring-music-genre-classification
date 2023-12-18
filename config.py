@@ -1,9 +1,9 @@
 import os
 
-MODEL_PATH = "model"
+MODEL_PATH = ""
 DATASET_PATH = "archive/Data/genres_original"
-FEATURE_PATH = "C:/Users/MH85/school/musicgc/feature/mfcc.json"
-MAPPING_PATH = "C:/Users/MH85/school/musicgc/feature/mapping.json"
+FEATURE_PATH = "mfcc.json"
+MAPPING_PATH = "mapping.json"
 
 SAMPLE_RATE = 22050
 TRACK_DURATION_SECONDS = 30

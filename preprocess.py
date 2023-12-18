@@ -28,6 +28,7 @@ def save_mfcc(dataset_path, num_mfcc=13, n_fft=2048, hop_length=512, num_segment
 
     samples_per_segment = int(SAMPLES_PER_TRACK / num_segments)
     num_mfcc_vectors_per_segment = math.ceil(samples_per_segment / hop_length)
+    bad_samples = 0
 
     # loop through all genre sub-folder
     for i, (dirpath, dirnames, filenames) in enumerate(os.walk(dataset_path)):
@@ -67,25 +68,18 @@ def save_mfcc(dataset_path, num_mfcc=13, n_fft=2048, hop_length=512, num_segment
                         if len(mfcc) == num_mfcc_vectors_per_segment:
                             data["mfcc"].append(mfcc.tolist())
                             data["labels"].append(i-1)
+                        else:
+                            bad_samples += 1
                 except Exception:
+                    bad_samples += 10
                     pass
 
+    print("\nCorrupted samples: {}".format(bad_samples))
     # save MFCCs to json file
     with open(FEATURE_PATH, "w") as fp:
         json.dump(data, fp, indent=2)
     with open(MAPPING_PATH, "w") as fp:
         json.dump(mapping, fp, indent=2)
-
-def make_paths():
-    """Creates paths for the feature, and mapping files if they do not exist.
-
-        :return:
-        """
-    if not os.path.exists(FEATURE_PATH):
-        os.makedirs(FEATURE_PATH)
-    if not os.path.exists(MAPPING_PATH):
-        os.makedirs(MAPPING_PATH)
         
 if __name__ == "__main__":
-    make_paths()
     save_mfcc(DATASET_PATH, num_segments=NUM_SEGMENTS)

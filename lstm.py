@@ -5,7 +5,7 @@ import tensorflow.keras as keras
 from config import MODEL_PATH, FEATURE_PATH
 import os
 
-MODEL_PATH = os.path.join(MODEL_PATH, "/lstm.keras")
+MODEL_PATH = os.path.join(MODEL_PATH, "lstm.keras")
 
 
 def load_data(data_path):

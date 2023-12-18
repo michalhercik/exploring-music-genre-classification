@@ -1,4 +1,5 @@
 .*
 *pycache*
-data
-models
+archive
+*.keras
+*.json

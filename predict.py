@@ -6,9 +6,7 @@ import numpy as np
 from config import SAMPLES_PER_TRACK, SAMPLE_RATE, MAPPING_PATH, NUM_SEGMENTS, MODEL_PATH, TRACK_DURATION_SECONDS
 import tensorflow.keras as keras
 import sys
-
-INPUT_PATH = "./data/music"
-TRAINED_MODEL_PATH = MODEL_PATH + "/cnn.keras"
+from predictArgParser import parse_args
 
 def load(input_path, num_mfcc=13, n_fft=2048, hop_length=512, num_segments=5):
     """Extracts MFCCs from music dataset and saves them into a json file along witgh genre labels.
@@ -75,7 +73,7 @@ def load_mapping(path):
 
     return mapping["mapping"]
 
-def reduce(prediction, num_segments=5, type="max"):
+def reduce(prediction, type, num_segments=5):
     """Reduces prediction of segments into one prediction.
 
     :param prediction (ndarray): Prediction of segments
@@ -85,11 +83,17 @@ def reduce(prediction, num_segments=5, type="max"):
     """
     result = []
     classes = len(prediction[0])
+
     if type == "max":
         # pick maximum value for each class
         for i in range(0, len(prediction), num_segments):
             result.append(np.max(prediction[i:i + num_segments], axis=0).tolist())
-    else:
+    elif type == "min":
+        # pick minimum value for each class
+        for i in range(0, len(prediction), num_segments):
+            result.append(np.min(prediction[i:i + num_segments], axis=0).tolist())
+    elif type == "mean":
+        # calculate mean value for each class
         for i in range(0, len(prediction), num_segments):
             sum = np.zeros(classes)
             for j in range(i, i + num_segments):
@@ -98,55 +102,54 @@ def reduce(prediction, num_segments=5, type="max"):
 
     return result
 
-def pretty_print(prediction):
+def pretty_print(prediction, count):
     """Prints prediction in a nice way.
 
     :param prediction (array): Prediction to print
+    :param count (int): Number of predictions to print
     """
-        # combine prediction of segments for each audio file
+    sort = True
+    # combine prediction of segments for each audio file
     def bla(x):
         a = [[mapping[i], np.round(p, 2)] for i, p in enumerate(x)]
-        a = sorted(a, key=lambda n: n[1], reverse=True)
+        if sort:
+            a = sorted(a, key=lambda n: n[1], reverse=True)
         return a
      
     classification = map(bla, prediction)
-
+    
+    if count is None:
+        sort = False
+        count = 10
     for file, prediction in zip(names, classification):
-        a = ", ".join(map(lambda x: f"{x[0]} ({np.round(x[1], decimals=2)})", prediction[:3]))
+        a = ", ".join(map(lambda x: f"{x[0]} ({np.round(x[1], decimals=2)})", prediction[:count]))
         print(f"{file}:\n\t{a}")
-
-def get_arg(args, name, default):
-    try:
-        i = args.index(name)
-        if len(args) > i+1:
-            return args[i+1]
-    except ValueError:
-        pass
-    return default
 
 if __name__ == "__main__":
 
-    if "--help" in sys.argv:
-        print("Usage: python predict.py [--model <path>] [--input <path>] [--type <max/mean>]")
-    else:
-        print("loading ...")
+    args = parse_args(sys.argv[1:])
 
-        # load model
-        model = keras.models.load_model(get_arg(sys.argv, "--model", TRAINED_MODEL_PATH))
-        
-        # load labels mapping
-        mapping = load_mapping(MAPPING_PATH)
-        
-        # extract mfcc from given audio file 
-        names, mfcc = load(get_arg(sys.argv, "--input", INPUT_PATH), num_segments=NUM_SEGMENTS)
+    print("\nloading ...\n")
 
-        # convert 3d mfcc array into 4d array
+    # load mapping to genres
+    mapping = load_mapping(MAPPING_PATH)
+
+    # load model
+    model = keras.models.load_model(args.model)
+    
+    # extract mfcc from given audio file 
+    names, mfcc = load(args.input, num_segments=NUM_SEGMENTS)
+
+    # convert 3d mfcc array into 4d array if necessary
+    if model.layers[0].input_shape[1:] != mfcc.shape[1:]:
+        print("reshaping ...")
         features = mfcc[..., np.newaxis]
-        #features = mfcc
+    else:
+        features = mfcc
 
-        print("predicting ...")
+    print("\npredicting ...\n")
 
-        # make genre classification
-        prediction = model.predict(features)
-
-        pretty_print(reduce(prediction, num_segments=NUM_SEGMENTS, type=get_arg(sys.argv, "--type", "max")))
+    # make genre classification
+    prediction = model.predict(features)
+    
+    pretty_print(reduce(prediction, args.type, num_segments=NUM_SEGMENTS), args.count)
