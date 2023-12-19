@@ -2,14 +2,14 @@
 
 ## Abstract
 
-In this work I put together few scripts to extract features from dataset, train
-three neural network models (MLP, CNN, LSTM) and predict genres for given files.
-It was my first experience with music analysis and as the main source of
-information I used Valerio Velardos
+In this work I put together few scripts to extract features from a dataset,
+train three neural network models (MLP, CNN, LSTM) and predict genres for a
+given files. It was my first experience with music analysis and as the main
+source of information I used Valerio Velardos
 [series](https://youtube.com/playlist?list=PL-wATfeyAMNrtbkCNsLcpoAyBBRJZVlnf&si=TJ67v4J0N-aiQoKJ)
-about deep learning for audio. In next sections I will show how to train models,
-predict genres of audio files and briefly describe dataset, each script, network
-architectures and accuracies.
+about deep learning for audio. In the following sections I will show how to train
+the models, predict genres of an audio files using provided scripts and briefly
+describe the dataset, each script, network architectures and its performance.
 
 ## How to train and predict
 
@@ -17,33 +17,29 @@ The following steps describe how to train models and predict genres for audio
 files. It is assumed that you have downloaded and extracted [GTZAN
 Dataset](https://www.kaggle.com/datasets/andradaolteanu/gtzan-dataset-music-genre-classification)
 next to the scripts.
+
 1. Extract features from dataset and save them to JSON file by running
    `preprocess.py`.
 2. Train model on extracted features and save it by running one of `mlp.py`,
    `cnn.py`, `lstm.py`.
-3. Classify audio files with `predict.py` script. This script can take few arguments:
-    - `--model <path>`:
-    - `--input <path>`:
-    - `--type <mean/max>`:
-    - `--count <1-10>`: 
-
-
-
-
+3. Classify audio files with `predict.py` script. This script can take the following arguments:
+    - `--model <path_to_model>`: specify a path to a trained model (tested with `.keras`).
+    - `--input <path_to_audio>`: specify a path to a **folder** with audio files (tested with `.mp3` and `.wav`).
+    - `--type <min/max/mean>`: specify a type of an aggregation function for segments of an audio file (`mean` is default). 
+    - `--count <1-10>`: specify a number of printed genre results (sorted, highest first). Default behavior is printed all unsorted. 
 
 ## Dataset
 
-For training, validation and testing I used audio files from 
-[GTZAN Dataset](https://www.kaggle.com/datasets/andradaolteanu/gtzan-dataset-music-genre-classification).
-It is a collection of 10 genres with 100 audio files each, all having a length
-30 seconds. The genres are blues, classical, country, disco, hiphop, jazz,
-metal, pop, reggae, rock.
-
-Even though it is a very popular dataset it has many flaws like mislabeling or
-duplicates *TODO: reference*. Since trying methods for audio analysis is the
-main purpose of this project the dataset quality is not that important aspect as
-ease to use the data. For more accurate performance results the FMA dataset
-*TODO: reference* would be a better fit. 
+For training, validation and testing I used audio files from [GTZAN
+Dataset](https://www.kaggle.com/datasets/andradaolteanu/gtzan-dataset-music-genre-classification).
+It is a collection of *10* genres with *100* audio files each, all having a
+length of a *30* seconds. The genres are blues, classical, country, disco,
+hiphop, jazz, metal, pop, reggae and rock. Even though it is a very popular
+dataset it has many flaws like mislabeling or duplicates [[*1*](#1),[*2*](#)].
+Since trying methods for audio analysis is the main purpose of this project the
+dataset quality is not that important aspect as ease to use the data. For more
+accurate performance results the FMA dataset *TODO: reference* would be a better
+fit, especially the almost one terabyte large version. 
 
 ## Data preprocessing
 
@@ -86,7 +82,20 @@ LSTM (Long Short-Term Memory) has two LSTM layers then dense layer with dropout
 and ReLU as an activation function and as a last a dense output layer with
 softmax.
 
-### Preformance
+## Predictions
+
+Prediction has a three phases - preprocessing, predicting and aggregating.
+Preprocessing consists of loading first *30s* of an audio file (this implies the
+minimal length of an audio is *30s*), then splitting it into *10* segments and
+extracting features (MFCCs) as described in [Data
+preprocessing](#data-preprocessing). Predicting is then done using chosen neural
+network model. Lastly aggregating predicted genres of segments from the same
+audio file either by choosing minimal/maximal value or calculating mean. There
+is not really a reason for taking first *30s* of an audio file, using whole
+audio file could yield a better results but it would be harder to aggregate
+because of a variable number of segments for audio file.
+
+## Performance
 
 Model | Test Accuracy (%)
 ------|------------------
@@ -105,13 +114,11 @@ talking about *91%* accuracy *TODO: reference* on the same dataset using
 ensembles of ML algorithms but chasing higher accuracies on a dataset that is
 not a good representation of a real world is a questionable goal.
 
-I have also tried some testing with random data downloaded from
-[Pixabay](https://pixabay.com/music/) *TODO: describe* and the result were
-shockingly bad. From each downloaded audio is used only first *30s* and it is
-preprocessed as described in [Data preprocessing](#data-preprocessing) section.
-To make prediction audio segments of the same file are combined together either
-by averaging or choosing maximal value. The next table shows prediction results
-for each genre.
+I have also tried some testing with data downloaded from
+[Pixabay](https://pixabay.com/music/). I searched for each genre on the website
+and picked an one audio file that sounded as the genre I searched for. The
+prediction results can be seen in the table below displaying name of the audio,
+expected genre, and predicted probability of each genre.
 
 | Name | Genre | blues | classical | country | disco | hiphop | jazz | metal | pop | reggae | rock |
 |------|-------|-------|-----------|---------|-------|--------|------|-------|-----|--------|------|
@@ -126,19 +133,46 @@ Abstract fashion pop | Pop | 0.39 | 0.26 | 0.03 | 0.42 | 0.99 | 0.07 | 0.01 | **
 Reggae island fun | Reggae | 0.00 | 0.00 | 0.02 | 0.99 | 0.11 | 0.00 | 0.00 | 0.73 | **0.99** | 0.04 |
 Hard rock | Rock | 0.01 | 0.06 | 0.15 | 0.63 | 0.09 | 0.55 | 0.04 | 0.21 | 0.93 | **0.85** |
 
+The results are not surprising, *6/10* is predicted correctly. This result also
+supports results of papers showing that some genres are harder to classify than
+others *TODO: reference*. 
+
+## Conclusion
+
+Genre is not a well defined construct so it's classification is a hard task. For
+an example disco was pop music in 70s so maybe it would be better to do a music
+genre classification with respect to time. Another issue with a genre is that
+each genre contains sub-genres which is either completely new style or
+combination of existing one from another genres so it can get very confusing and
+new sub-genres are still emerging. Even though many new and better neural
+network architectures are created it is not enough to correctly classify music
+genre since it is not clear what that exactly means and even two people of the
+same age don't have to agree on a genre simply because genre classification is
+subjective.
+
+Despite all that the current state of the art approaches are getting better
+results than humans and with audio data growth hence active research in the
+field is done, we could expect machines getting only better at it. To make this
+project a useful one I would need to get better understanding of genres, audio
+analysis, change dataset, improve neural network architecture and also focus
+more on predicting but the main goal of this project was achieved - I learned a
+lot about audio analysis and machine learning.
+
+## Miscellaneous
+
+Script `config.py` contains paths and constants definitions used in other
+scripts. Feel free to change the values but remember all the scripts expects
+that the defined paths already exists except the file itself. Script
+`predictArgParser.py` is for parsing arguments passed to `predict.py` script.
 
 ## References
 
 ### GTZAN has flaws -> mislabeling, duplicates
 
-The State of the Art Ten Years After a State of the Art: Future Research in Music Information Retrieval
- - https://doi.org/10.1080/09298215.2014.894533
+1. <p id="1">The State of the Art Ten Years After a State of the Art: Future Research in Music Information Retrieval, [DOI](https://doi.org/10.1080/09298215.2014.894533)</p>
+2. An analysis of the GTZAN music genre dataset, [DOI](https://doi.org/10.1145/2390848.2390851)
 
-An analysis of the GTZAN music genre dataset
- - https://doi.org/10.1145/2390848.2390851
-
-FMA: A Dataset For Music Analysis
- - https://doi.org/10.48550/arXiv.1612.01840
+3. FMA: A Dataset For Music Analysis, [DOI](https://doi.org/10.48550/arXiv.1612.01840)
 
 ### Result is pleasing at first glance but not really (GTZAN flaws, and some testing)
 
