@@ -38,7 +38,7 @@ hiphop, jazz, metal, pop, reggae and rock. Even though it is a very popular
 dataset it has many flaws like mislabeling or duplicates [[*1*](#1),[*2*](#)].
 Since trying methods for audio analysis is the main purpose of this project the
 dataset quality is not that important aspect as ease to use the data. For more
-accurate performance results the FMA dataset *TODO: reference* would be a better
+accurate performance results the FMA dataset [[*3*](#3)] would be a better
 fit, especially the almost one terabyte large version. 
 
 ## Data preprocessing
@@ -103,16 +103,20 @@ CNN   | 73,9
 LSTM  | 64,2             
 MLP   | 56,4             
 
-This paper says *TODO: reference* that according to this paper *TODO: reference*
-a human accuracy in genre classification is on average *70 %* for *10* genres.
-Since the original paper is old, I couldn't verify it so let's just take it as a
-hard to trust reference value and work with it. 
+This paper says [[*4*](#4)] that according to this paper [[*5*](#5)] a human
+accuracy in a genre classification is on average *70 %* for *10* genres. Since
+the original paper is old, I couldn't verify it so let's just take it as a hard
+to trust reference value and work with it. 
 
-CNN is the only one that beated the human accuracy and according to some papers
-*TODO: reference* the accuracy is not bad overall but there are also papers
-talking about *91%* accuracy *TODO: reference* on the same dataset using
-ensembles of ML algorithms but chasing higher accuracies on a dataset that is
-not a good representation of a real world is a questionable goal.
+Surprisingly LSTM which should work great with a time series of features has not
+the best results but this can be just because of a bad parameters. CNN is the
+only one that surpassed the human accuracy. A similar accuracy is achieved in
+this paper from *2018* [[*6*](#6)] but currently there are also papers talking
+about much higher accuracies raising over *90%* [[*7*](#7), [*8*](#8),
+[*9*](#9)]. It would almost sound that the problem is solved but this benchmarks
+are done on GTZAN dataset which has as I mentioned in section
+[Dataset](#dataset) many flaws. Neural networks benchmarked on the FMA dataset
+are getting much worse results [[*10*](#10)].
 
 I have also tried some testing with data downloaded from
 [Pixabay](https://pixabay.com/music/). I searched for each genre on the website
@@ -133,9 +137,9 @@ Abstract fashion pop | Pop | 0.39 | 0.26 | 0.03 | 0.42 | 0.99 | 0.07 | 0.01 | **
 Reggae island fun | Reggae | 0.00 | 0.00 | 0.02 | 0.99 | 0.11 | 0.00 | 0.00 | 0.73 | **0.99** | 0.04 |
 Hard rock | Rock | 0.01 | 0.06 | 0.15 | 0.63 | 0.09 | 0.55 | 0.04 | 0.21 | 0.93 | **0.85** |
 
-The results are not surprising, *6/10* is predicted correctly. This result also
-supports results of papers showing that some genres are harder to classify than
-others *TODO: reference*. 
+The results are not surprising, *6/10* is predicted correctly. It also looks
+like some genres are harder to predict than others that can be also observed in
+this paper [[*10*](#10)].
 
 ## Conclusion
 
@@ -167,39 +171,18 @@ that the defined paths already exists except the file itself. Script
 
 ## References
 
-### GTZAN has flaws -> mislabeling, duplicates
+ 1. <span id="1">An analysis of the GTZAN music genre dataset, [DOI](https://doi.org/10.1145/2390848.2390851)</span>
+ 2. <span id="2">The State of the Art Ten Years After a State of the Art: Future Research in Music Information Retrieval, [DOI](https://doi.org/10.1080/09298215.2014.894533)</span>
+ 3. <span id="3">FMA: A Dataset For Music Analysis, [DOI](https://doi.org/10.48550/arXiv.1612.01840)</span>
+ 4. <span id="4">Convolutional Neural Network Achieves Human-level Accuracy in Music Genre Classification, [DOI](https://doi.org/10.48550/arXiv.1802.09697)</span>
+ 5. <span id="5">Human accuracy [DOI](https://doi.org/10.1109/ICASSP.2004.1326806)</span>
+ 6. <span id="6">A Novel Music Genre Classification Using Convolutional Neural Network, [DOI](https://doi.org/10.1109/ICCES51350.2021.9489022)</span>
+ 7. <span id="7">Comparing Recurrent Neural Network Types in a Music Genre Classification Task: Gated Recurrent Unit Superiority Using the GTZAN Dataset, [DOI](https://www.researchgate.net/profile/Eric-Odle/publication/374698715_Comparing_Recurrent_Neural_Network_Types_in_a_Music_Genre_Classification_Task_Gated_Recurrent_Unit_Superiority_Using_the_GTZAN_Dataset/links/6529d3e81a05311a23fbe815/Comparing-Recurrent-Neural-Network-Types-in-a-Music-Genre-Classification-Task-Gated-Recurrent-Unit-Superiority-Using-the-GTZAN-Dataset.pdf)</span>
+ 8. <span id="8">Genre Classification in Music using Convolutional Neural Networks, [DOI](https://doi.org/10.1007/978-981-99-7339-2_33)</span>
+ 9. <span id="9">A Hybrid Model for Music Genre Classification Using LSTM and SVM [DOI](https://doi.org/10.1109/IC3.2018.8530557)</span>
+ 10. <span id="10">Music Genre Classification: Looking for the Perfect Network, [DOI](https://doi.org/10.1007/978-3-030-77961-0_6)</span>
 
-1. <p id="1">The State of the Art Ten Years After a State of the Art: Future Research in Music Information Retrieval, [DOI](https://doi.org/10.1080/09298215.2014.894533)</p>
-2. An analysis of the GTZAN music genre dataset, [DOI](https://doi.org/10.1145/2390848.2390851)
 
-3. FMA: A Dataset For Music Analysis, [DOI](https://doi.org/10.48550/arXiv.1612.01840)
-
-### Result is pleasing at first glance but not really (GTZAN flaws, and some testing)
-
-Convolutional Neural Network Achieves Human-level Accuracy in Music Genre Classification
-- https://doi.org/10.48550/arXiv.1802.09697
-
-Human accuracy
- - https://doi.org/10.1109/ICASSP.2004.1326806
-
-A Hybrid Model for Music Genre Classification Using LSTM and SVM
- - https://doi.org/10.1109/IC3.2018.8530557
- - interesting accuracy
-
-A Novel Music Genre Classification Using Convolutional Neural Network
-  - https://doi.org/10.1109/ICCES51350.2021.9489022
-
-### Multilabel make more sense, pop is stupid
-
-Music Genre Classification: Looking for the Perfect Network
- - https://doi.org/10.1007/978-3-030-77961-0_6
- - different dataset
- - conclusion - multilabel, pop is stupid
-
-### Better neural networks architecture exists
-
-Comparing Recurrent Neural Network Types in a Music Genre Classification Task: Gated Recurrent Unit Superiority Using the GTZAN Dataset
- - https://www.researchgate.net/profile/Eric-Odle/publication/374698715_Comparing_Recurrent_Neural_Network_Types_in_a_Music_Genre_Classification_Task_Gated_Recurrent_Unit_Superiority_Using_the_GTZAN_Dataset/links/6529d3e81a05311a23fbe815/Comparing-Recurrent-Neural-Network-Types-in-a-Music-Genre-Classification-Task-Gated-Recurrent-Unit-Superiority-Using-the-GTZAN-Dataset.pdf
 
 
 
