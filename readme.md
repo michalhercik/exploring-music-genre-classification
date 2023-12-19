@@ -55,7 +55,7 @@ data. Then extract from each segment Mel Frequency Cepstrum Coefficients
 auditory system, which should be very handy in classifying social construct such
 as music genre. The final shape of preprocessed data is *(9986, 130, 13)*.
 *9986* we get by splitting each audio sample into 10 segments and remove
-corrupted segments. *130* is number of FT for each segment and 13 is number of
+corrupted segments. *130* is number of FT for each segment and *13* is number of
 MFCCs.  
 
 ## Neural network models
@@ -104,7 +104,7 @@ LSTM  | 64,2
 MLP   | 56,4             
 
 This paper says [[*4*](#4)] that according to this paper [[*5*](#5)] a human
-accuracy in a genre classification is on average *70 %* for *10* genres. Since
+accuracy in a genre classification is on average *70%* for *10* genres. Since
 the original paper is old, I couldn't verify it so let's just take it as a hard
 to trust reference value and work with it. 
 
